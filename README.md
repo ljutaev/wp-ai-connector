@@ -15,7 +15,7 @@
 
 ---
 
-> **Status:** Pre-alpha. Scaffold only — no implementation yet. Design specs land in [`docs/superpowers/specs/`](docs/superpowers/specs/) before any feature ships.
+> **Status:** Pre-alpha. Scaffold only — no implementation yet.
 
 ## Why
 
@@ -101,7 +101,6 @@ Found a security issue? See [SECURITY.md](SECURITY.md) for the disclosure proces
 
 ## Documentation
 
-- [Design specifications](docs/superpowers/specs/) — architectural decisions and module designs
 - [Contributing](CONTRIBUTING.md) — local development, coding standards, PR process
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Security Policy](SECURITY.md)

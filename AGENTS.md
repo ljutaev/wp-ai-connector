@@ -38,13 +38,13 @@ If a decision needs to change, update this table in the same commit that changes
 
 ### 3.1 Design before code
 
-For any non-trivial feature, **write the design first** in `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`, get human approval, then implement.
+For any non-trivial feature, **write the design first**, get human approval, then implement.
 
 Order of operations:
 1. **Brainstorm** the feature with the human until requirements are clear.
-2. **Write the spec** to `docs/superpowers/specs/`.
+2. **Write a spec** capturing the agreed design.
 3. **Wait for human approval** of the spec.
-4. **Write the plan** (decomposition into steps with verification gates).
+4. **Write the plan** — decomposition into steps with verification gates.
 5. **Implement** following TDD where applicable.
 
 Do not skip steps 2–4 because something "seems simple."
@@ -125,7 +125,6 @@ If a contribution touches any of these, discuss in an issue before writing code.
 ```
 wp-ai-connector/
 ├── .github/                     # workflows, issue + PR templates
-├── docs/superpowers/specs/      # design specifications (must exist before implementation)
 ├── src/                         # PSR-4 source (WPAIConnector\)
 │   ├── Core/                    # plugin bootstrap, container, router glue
 │   ├── Auth/                    # API key management, capability scoping
@@ -148,7 +147,7 @@ Folders not yet created are placeholders until their first commit lands.
 ## 10. When in doubt
 
 - Read this file first.
-- Read the latest spec in `docs/superpowers/specs/`.
+- Read the latest design notes shared in the issue or PR you're working from.
 - Ask the human. One concrete question is better than three speculative paragraphs.
 
 ---
