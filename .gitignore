@@ -37,3 +37,7 @@ wp-config.php
 .env
 .env.local
 .env.*.local
+
+# Author-private design notes and specs.
+# Kept locally only — not part of the public repository.
+/docs/
