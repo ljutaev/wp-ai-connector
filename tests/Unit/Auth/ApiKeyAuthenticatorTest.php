@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace WPAIConnector\Tests\Unit\Auth;
 
+use Brain\Monkey;
+use Brain\Monkey\Functions;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use WPAIConnector\Auth\ApiKey;
@@ -11,6 +13,17 @@ use WPAIConnector\Auth\ApiKeyFactory;
 use WPAIConnector\Auth\ApiKeyRepository;
 
 final class ApiKeyAuthenticatorTest extends TestCase {
+
+	protected function setUp(): void {
+		parent::setUp();
+		Monkey\setUp();
+		Functions\stubs( [ 'wp_salt' => static fn () => 'test-salt' ] );
+	}
+
+	protected function tearDown(): void {
+		Monkey\tearDown();
+		parent::tearDown();
+	}
 
 	public function test_returns_null_when_no_matching_hash(): void {
 		$repo = $this->createMock( ApiKeyRepository::class );
