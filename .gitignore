@@ -1,0 +1,39 @@
+# Composer
+/vendor/
+composer.lock
+
+# PHPUnit
+.phpunit.cache/
+.phpunit.result.cache
+/coverage/
+
+# PHPStan
+.phpstan.cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~
+.fleet/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build / release artefacts
+/build/
+/dist/
+*.zip
+
+# WordPress local dev mounts
+/wordpress/
+wp-config.php
+
+# Logs
+*.log
+
+# Env
+.env
+.env.local
+.env.*.local
