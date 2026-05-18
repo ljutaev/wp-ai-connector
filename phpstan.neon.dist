@@ -1,0 +1,11 @@
+parameters:
+  level: 8
+  paths:
+    - wp-ai-connector.php
+    - src
+  bootstrapFiles:
+    - vendor/szepeviktor/phpstan-wordpress/bootstrap.php
+  treatPhpDocTypesAsCertain: false
+  reportUnmatchedIgnoredErrors: true
+  checkMissingIterableValueType: true
+  ignoreErrors: []
