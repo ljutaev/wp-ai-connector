@@ -16,6 +16,7 @@ use WPAIConnector\Modules\Core\Controllers\PluginsController;
 use WPAIConnector\Modules\Core\Controllers\PostsController;
 use WPAIConnector\Modules\Core\Controllers\TermsController;
 use WPAIConnector\Modules\Core\Controllers\ThemesController;
+use WPAIConnector\Modules\Core\Controllers\QueryController;
 use WPAIConnector\Modules\Core\Controllers\TransientsController;
 use WPAIConnector\Modules\Core\Controllers\UsersController;
 
@@ -53,6 +54,7 @@ final class CoreModule extends AbstractModule {
 		$container->set( ThemesController::class, static fn () => new ThemesController() );
 		$container->set( TransientsController::class, static fn () => new TransientsController() );
 		$container->set( CronController::class, static fn () => new CronController() );
+		$container->set( QueryController::class, static fn () => new QueryController() );
 
 		add_action(
 			'rest_api_init',
@@ -68,6 +70,7 @@ final class CoreModule extends AbstractModule {
 				$container->get( ThemesController::class )->register_routes();
 				$container->get( TransientsController::class )->register_routes();
 				$container->get( CronController::class )->register_routes();
+				$container->get( QueryController::class )->register_routes();
 			}
 		);
 	}
@@ -361,6 +364,28 @@ final class CoreModule extends AbstractModule {
 						),
 					),
 					'ai_hint'     => 'Each entry has hook, timestamp, next_run (UTC ISO-8601), schedule, and interval (seconds).',
+				),
+				// Query
+				array(
+					'method'      => 'POST',
+					'path'        => '/query',
+					'scope'       => 'query:read',
+					'description' => 'Run a read-only SQL SELECT or WITH (CTE) statement against the WordPress database.',
+					'parameters'  => array(
+						array(
+							'name'     => 'sql',
+							'in'       => 'body',
+							'type'     => 'string',
+							'required' => true,
+						),
+						array(
+							'name'    => 'limit',
+							'in'      => 'body',
+							'type'    => 'integer',
+							'default' => 500,
+						),
+					),
+					'ai_hint'     => 'Use for complex queries not covered by other endpoints. Only SELECT and WITH are allowed. LIMIT auto-injected (max 2000). Table prefix is $wpdb->prefix (usually wp_). Returns rows[], row_count, limit_used.',
 				),
 			),
 			'options_allowlist' => $keys,
