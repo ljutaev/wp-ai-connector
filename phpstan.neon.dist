@@ -11,6 +11,11 @@ parameters:
   treatPhpDocTypesAsCertain: false
   reportUnmatchedIgnoredErrors: true
   checkMissingIterableValueType: true
+  excludePaths:
+    # WooCommerce classes (WC_Order, WC_Product, wc_get_orders, etc.) are only available
+    # when WooCommerce is active. PHPStan runs without WC installed.
+    - src/Modules/WooCommerce
+
   ignoreErrors:
     # WP_CLI is loaded conditionally; unavailable to PHPStan analysis.
     - message: '#(unknown class WP_CLI|Call to static method .+ on an unknown class WP_CLI)#'
