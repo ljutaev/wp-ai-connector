@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-19
+
+### Added
+
+- `PostsController` — `GET /posts`, `GET /posts/{id}`, `POST /posts/{id}` (update title/content/status)
+- `UsersController` — `GET /users`, `GET /users/{id}` with role filter
+- `TermsController` — `GET /terms` (any taxonomy), `GET /terms/{id}`; validates taxonomy existence
+- `CommentsController` — `GET /comments`, `GET /comments/{id}`, `POST /comments/{id}` (approve/unapprove/spam)
+- `MediaController` — `GET /media`, `GET /media/{id}` with mime_type filter
+- `MenusController` — `GET /menus`, `GET /menus/{id}` with full item tree
+- `PluginsController` — `GET /plugins` with active/inactive filter
+- `ThemesController` — `GET /themes`, `GET /themes/active`
+- `TransientsController` — `GET /transients/{key}` (expired flag), `DELETE /transients/{key}`, `POST /transients/{key}/flush`
+- `CronController` — `GET /cron` sorted by next run; supports hook filter
+- `tests/Stubs/WpStubs.php` — minimal WP class stubs for unit tests (WP_REST_Controller, WP_REST_Response, WP_Error, etc.)
+- All 10 controllers wired in `CoreModule` with DI container and manifest routes (22 total routes documented)
+- Version bumped to `0.3.0`
+
 ## [0.2.0-alpha] - 2026-05-19
 
 ### Added

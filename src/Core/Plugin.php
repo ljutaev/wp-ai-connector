@@ -19,6 +19,7 @@ use WPAIConnector\Modules\ModuleRegistry;
 
 final class Plugin {
 
+	/** @var self|null */
 	private static ?self $instance = null;
 
 	private function __construct(
