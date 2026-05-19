@@ -19,7 +19,29 @@
 		<exclude name="WordPress.Files.FileName"/>
 	</rule>
 	<rule ref="WordPress-Extra"/>
-	<rule ref="WordPress-Docs"/>
+	<rule ref="WordPress-Docs">
+		<!-- PHP 8.1 typed signatures make per-parameter @param tags redundant. -->
+		<exclude name="Squiz.Commenting.FunctionComment.MissingParamTag"/>
+		<exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
+		<exclude name="Squiz.Commenting.FunctionComment.ParamNameNoMatch"/>
+		<exclude name="Squiz.Commenting.FunctionComment.IncorrectTypeHint"/>
+		<exclude name="Squiz.Commenting.FunctionComment.MissingReturn"/>
+		<exclude name="Squiz.Commenting.FunctionComment.Missing"/>
+		<exclude name="Squiz.Commenting.FileComment.Missing"/>
+		<exclude name="Squiz.Commenting.FileComment.MissingPackageTag"/>
+		<exclude name="Squiz.Commenting.FileComment.WrongStyle"/>
+		<exclude name="Generic.Commenting.DocComment.MissingShort"/>
+		<exclude name="Squiz.Commenting.ClassComment.Missing"/>
+		<exclude name="Squiz.Commenting.InlineComment.InvalidEndChar"/>
+	</rule>
+
+	<!-- Repository classes perform direct DB queries by design (no caching layer). -->
+	<rule ref="WordPress.DB.DirectDatabaseQuery.DirectQuery">
+		<exclude-pattern>*/src/Auth/ApiKeyRepository\.php</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.DB.DirectDatabaseQuery.NoCaching">
+		<exclude-pattern>*/src/Auth/ApiKeyRepository\.php</exclude-pattern>
+	</rule>
 
 	<config name="minimum_supported_wp_version" value="6.6"/>
 	<config name="testVersion" value="8.1-"/>

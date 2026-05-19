@@ -3,7 +3,7 @@
  * Plugin Name:       WP AI Connector
  * Plugin URI:        https://github.com/ljutaev/wp-ai-connector
  * Description:       Lightweight REST API & MCP connector for WordPress. Manage your site from Claude, ChatGPT, Cursor, and the terminal.
- * Version:           0.1.0
+ * Version:           0.2.0-alpha
  * Requires at least: 6.6
  * Requires PHP:      8.1
  * Author:            Oleksandr Lukashuk
@@ -18,12 +18,10 @@
 
 defined( 'ABSPATH' ) || exit;
 
-/*
- * Plugin entry point.
- *
- * The implementation lands after the design specification is approved.
- * Until then, this file only declares plugin metadata so the plugin can be
- * activated in a development environment without doing anything yet.
- *
- * Design specifications live in docs/superpowers/specs/.
- */
+if ( ! defined( 'WPAIC_FILE' ) ) {
+	define( 'WPAIC_FILE', __FILE__ );
+}
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+\WPAIConnector\Core\Plugin::boot( WPAIC_FILE );
