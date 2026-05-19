@@ -3,7 +3,7 @@
  * Plugin Name:       WP AI Connector
  * Plugin URI:        https://github.com/ljutaev/wp-ai-connector
  * Description:       Lightweight REST API & MCP connector for WordPress. Manage your site from Claude, ChatGPT, Cursor, and the terminal.
- * Version:           0.2.0-alpha
+ * Version:           0.3.0
  * Requires at least: 6.6
  * Requires PHP:      8.1
  * Author:            Oleksandr Lukashuk

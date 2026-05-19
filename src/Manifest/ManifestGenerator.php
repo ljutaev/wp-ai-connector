@@ -7,7 +7,7 @@ use WPAIConnector\Modules\ModuleInterface;
 
 final class ManifestGenerator {
 
-	public const PLUGIN_VERSION = '0.2.0-alpha';
+	public const PLUGIN_VERSION = '0.3.0';
 
 	/**
 	 * @param array<int, ModuleInterface> $modules
