@@ -10,7 +10,7 @@ namespace WPAIConnector\Core;
  */
 final class Migrator {
 
-	public const TARGET_VERSION = 1;
+	public const TARGET_VERSION = 2;
 	public const OPTION_KEY     = 'wpaic_schema_version';
 
 	/**

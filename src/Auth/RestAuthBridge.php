@@ -17,6 +17,7 @@ final class RestAuthBridge {
 		private readonly BearerHeaderReader $reader,
 		private readonly ApiKeyAuthenticator $authenticator,
 		private readonly ApiKeyRepository $repository,
+		private readonly ?RateLimiter $rate_limiter = null,
 	) {
 	}
 
@@ -43,10 +44,26 @@ final class RestAuthBridge {
 			return ErrorResponse::unauthorized( 'Bearer token invalid or revoked.' );
 		}
 
+		if ( null !== $this->rate_limiter && ! $this->rate_limiter->allow( $key->id ) ) {
+			$response = ErrorResponse::make( 'wpaic_rate_limited', 'Rate limit exceeded.', 429 );
+			$response->add_data(
+				array(
+					'status'      => 429,
+					'limit'       => $this->rate_limiter->limit(),
+					'window'      => $this->rate_limiter->window(),
+					'retry_after' => $this->rate_limiter->window(),
+				)
+			);
+			return $response;
+		}
+
 		wp_set_current_user( $key->user_id );
 
 		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['REMOTE_ADDR'] ) ) : '';
 		$this->repository->touch( $key->id, $ip );
+
+		// Store key on request context for downstream use (audit log, scope check).
+		$GLOBALS['wpaic_current_key'] = $key;
 
 		return true;
 	}
