@@ -20,6 +20,7 @@ use WPAIConnector\Modules\Core\Controllers\SkillController;
 use WPAIConnector\Modules\Core\CoreModule;
 use WPAIConnector\Modules\ModuleInterface;
 use WPAIConnector\Modules\ModuleRegistry;
+use WPAIConnector\Modules\WooCommerce\WooCommerceModule;
 
 final class Plugin {
 
@@ -58,7 +59,10 @@ final class Plugin {
 
 	public function load_modules(): void {
 		/** @var array<int, ModuleInterface> $defaults */
-		$defaults = array( new CoreModule() );
+		$defaults = array(
+			new CoreModule(),
+			new WooCommerceModule(),
+		);
 
 		/** @var array<int, ModuleInterface> $candidates */
 		$candidates = apply_filters( 'wp_ai_connector_modules', $defaults );

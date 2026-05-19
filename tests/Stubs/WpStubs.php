@@ -209,3 +209,70 @@ if ( ! class_exists( 'WP_Query' ) ) {
 		public function __construct( array $args = array() ) {}
 	}
 }
+
+if ( ! class_exists( 'WC_Order' ) ) {
+	class WC_Order {
+		public function get_id(): int { return 0; }
+		public function get_status(): string { return 'pending'; }
+		public function get_currency(): string { return 'USD'; }
+		public function get_total(): string { return '0.00'; }
+		public function get_subtotal(): float { return 0.0; }
+		public function get_total_tax(): string { return '0.00'; }
+		public function get_shipping_total(): string { return '0.00'; }
+		public function get_customer_id(): int { return 0; }
+		public function get_billing_email(): string { return ''; }
+		public function get_formatted_billing_full_name(): string { return ''; }
+		public function get_payment_method_title(): string { return ''; }
+		public function get_date_created(): ?\DateTimeInterface { return null; }
+		public function get_date_modified(): ?\DateTimeInterface { return null; }
+		public function get_item_count(): int { return 0; }
+		/** @return array<mixed> */
+		public function get_items( string $type = 'line_item' ): array { return array(); }
+	}
+}
+
+if ( ! class_exists( 'WC_Order_Item_Product' ) ) {
+	class WC_Order_Item_Product {
+		public function get_product_id(): int { return 0; }
+		public function get_name(): string { return ''; }
+		public function get_quantity(): int { return 0; }
+		public function get_subtotal(): string { return '0.00'; }
+		public function get_total(): string { return '0.00'; }
+		public function get_product(): ?object { return null; }
+	}
+}
+
+if ( ! class_exists( 'WC_Product' ) ) {
+	class WC_Product {
+		public function get_id(): int { return 0; }
+		public function get_name(): string { return ''; }
+		public function get_slug(): string { return ''; }
+		public function get_type(): string { return 'simple'; }
+		public function get_status(): string { return 'publish'; }
+		public function get_sku(): string { return ''; }
+		public function get_price(): string { return '0.00'; }
+		public function get_regular_price(): string { return '0.00'; }
+		public function get_sale_price(): string { return ''; }
+		public function is_on_sale(): bool { return false; }
+		public function get_stock_status(): string { return 'instock'; }
+		public function get_total_sales(): int { return 0; }
+		public function get_description(): string { return ''; }
+		public function get_short_description(): string { return ''; }
+		public function get_stock_quantity(): ?int { return null; }
+		public function managing_stock(): bool { return false; }
+		public function get_backorders(): string { return 'no'; }
+		public function get_weight(): string { return ''; }
+		public function get_length(): string { return ''; }
+		public function get_width(): string { return ''; }
+		public function get_height(): string { return ''; }
+		public function set_name( string $name ): void {}
+		public function set_regular_price( string $price ): void {}
+		public function set_sale_price( string $price ): void {}
+		public function set_description( string $desc ): void {}
+		public function set_short_description( string $desc ): void {}
+		public function set_status( string $status ): void {}
+		public function set_stock_quantity( int $qty ): void {}
+		public function set_manage_stock( bool $manage ): void {}
+		public function save(): int { return 0; }
+	}
+}
