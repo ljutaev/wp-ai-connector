@@ -10,7 +10,8 @@ final class SkillGenerator {
 	 */
 	public function generate( array $manifest ): string {
 		$site_url = (string) ( $manifest['plugin']['site_url'] ?? '' );
-		$parsed   = function_exists( 'wp_parse_url' ) ? wp_parse_url( $site_url, PHP_URL_HOST ) : parse_url( $site_url, PHP_URL_HOST );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url -- wp_parse_url unavailable outside WP (unit tests).
+		$parsed = function_exists( 'wp_parse_url' ) ? wp_parse_url( $site_url, PHP_URL_HOST ) : parse_url( $site_url, PHP_URL_HOST );
 		$host     = is_string( $parsed ) ? $parsed : '';
 		$slug     = 'wp-ai-connector-' . str_replace( '.', '-', $host );
 
@@ -22,8 +23,8 @@ final class SkillGenerator {
 		$out .= "Set header: `Authorization: Bearer <YOUR_KEY>`\n\n";
 		$out .= "## Endpoints\n\n";
 
-		foreach ( (array) ( $manifest['modules'] ?? [] ) as $module ) {
-			foreach ( (array) ( $module['routes'] ?? [] ) as $route ) {
+		foreach ( (array) ( $manifest['modules'] ?? array() ) as $module ) {
+			foreach ( (array) ( $module['routes'] ?? array() ) as $route ) {
 				$method = (string) ( $route['method'] ?? '' );
 				$path   = (string) ( $route['path'] ?? '' );
 				$desc   = (string) ( $route['description'] ?? '' );

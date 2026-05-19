@@ -21,10 +21,10 @@ final class CoreModule extends AbstractModule {
 
 	/** @return array<int, \WPAIConnector\Modules\ConditionalInterface> */
 	public function conditionals(): array {
-		return [
+		return array(
 			new PHPVersionConditional( '8.1' ),
 			new WordPressVersionConditional( '6.6' ),
-		];
+		);
 	}
 
 	public function register( Container $container ): void {
@@ -46,38 +46,47 @@ final class CoreModule extends AbstractModule {
 	public function manifest(): array {
 		$keys = ( new OptionsAllowlist() )->known();
 
-		return [
-			'name'           => 'core',
-			'version'        => $this->version(),
-			'detected'       => true,
-			'routes'         => [
-				[
+		return array(
+			'name'              => 'core',
+			'version'           => $this->version(),
+			'detected'          => true,
+			'routes'            => array(
+				array(
 					'method'      => 'GET',
 					'path'        => '/options/{key}',
 					'scope'       => 'options:read',
 					'description' => 'Read a WordPress option from the curated allowlist.',
-					'parameters'  => [
-						[
+					'parameters'  => array(
+						array(
 							'name' => 'key',
 							'in'   => 'path',
 							'type' => 'string',
 							'enum' => $keys,
-						],
-					],
-				],
-				[
+						),
+					),
+				),
+				array(
 					'method'      => 'POST',
 					'path'        => '/options/{key}',
 					'scope'       => 'options:write',
 					'description' => 'Update a WordPress option from the curated allowlist.',
-					'parameters'  => [
-						[ 'name' => 'key', 'in' => 'path', 'type' => 'string', 'enum' => $keys ],
-						[ 'name' => 'value', 'in' => 'body', 'type' => 'string' ],
-					],
+					'parameters'  => array(
+						array(
+							'name' => 'key',
+							'in'   => 'path',
+							'type' => 'string',
+							'enum' => $keys,
+						),
+						array(
+							'name' => 'value',
+							'in'   => 'body',
+							'type' => 'string',
+						),
+					),
 					'ai_hint'     => "Common keys: 'blog_public' (0 hides from search engines, 1 shows), 'blogname' (site title), 'blogdescription' (tagline).",
-				],
-			],
+				),
+			),
 			'options_allowlist' => $keys,
-		];
+		);
 	}
 }

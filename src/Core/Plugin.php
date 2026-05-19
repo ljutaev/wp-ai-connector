@@ -37,18 +37,18 @@ final class Plugin {
 	}
 
 	private function register(): void {
-		register_activation_hook( $this->plugin_file, [ Installer::class, 'activate' ] );
+		register_activation_hook( $this->plugin_file, array( Installer::class, 'activate' ) );
 
-		add_action( 'plugins_loaded', [ Installer::class, 'maybe_upgrade' ], 5 );
+		add_action( 'plugins_loaded', array( Installer::class, 'maybe_upgrade' ), 5 );
 
-		add_action( 'init', [ $this, 'load_modules' ], 5 );
-		add_action( 'rest_api_init', [ $this, 'register_meta_routes' ] );
-		add_action( 'cli_init', [ $this, 'register_cli' ] );
+		add_action( 'init', array( $this, 'load_modules' ), 5 );
+		add_action( 'rest_api_init', array( $this, 'register_meta_routes' ) );
+		add_action( 'cli_init', array( $this, 'register_cli' ) );
 	}
 
 	public function load_modules(): void {
 		/** @var array<int, ModuleInterface> $defaults */
-		$defaults = [ new CoreModule() ];
+		$defaults = array( new CoreModule() );
 
 		/** @var array<int, ModuleInterface> $candidates */
 		$candidates = apply_filters( 'wp_ai_connector_modules', $defaults );
@@ -64,7 +64,7 @@ final class Plugin {
 		/** @var array<int, ModuleInterface> $modules */
 		$modules = $this->container->has( 'active_modules' )
 			? $this->container->get( 'active_modules' )
-			: [];
+			: array();
 
 		$manifest_gen = new ManifestGenerator();
 		$skill_gen    = new SkillGenerator();

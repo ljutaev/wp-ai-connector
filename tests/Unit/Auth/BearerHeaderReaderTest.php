@@ -9,7 +9,7 @@ use WPAIConnector\Auth\BearerHeaderReader;
 final class BearerHeaderReaderTest extends TestCase {
 
 	protected function setUp(): void {
-		$_SERVER = [];
+		$_SERVER = array();
 	}
 
 	public function test_returns_token_from_standard_authorization_header(): void {

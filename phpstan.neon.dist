@@ -1,3 +1,6 @@
+includes:
+  - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
 parameters:
   level: 8
   paths:
@@ -8,4 +11,9 @@ parameters:
   treatPhpDocTypesAsCertain: false
   reportUnmatchedIgnoredErrors: true
   checkMissingIterableValueType: true
-  ignoreErrors: []
+  ignoreErrors:
+    # WP_CLI is loaded conditionally; unavailable to PHPStan analysis.
+    - message: '#(unknown class WP_CLI|Call to static method .+ on an unknown class WP_CLI)#'
+      paths:
+        - src/CLI/KeyCommand.php
+        - src/Core/Plugin.php

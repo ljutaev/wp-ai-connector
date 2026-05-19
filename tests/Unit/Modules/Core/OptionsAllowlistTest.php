@@ -37,7 +37,7 @@ final class OptionsAllowlistTest extends TestCase {
 
 	public function test_rejects_sensitive_keys_even_if_filter_adds_them(): void {
 		Filters\expectApplied( 'wp_ai_connector_options_allowlist' )
-			->andReturn( [ 'blogname', 'auth_key' ] );
+			->andReturn( array( 'blogname', 'auth_key' ) );
 
 		$allowlist = new OptionsAllowlist();
 

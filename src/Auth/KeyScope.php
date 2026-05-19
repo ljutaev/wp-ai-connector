@@ -35,7 +35,7 @@ final class KeyScope {
 			return false;
 		}
 
-		$prefix = substr( $granted, 0, -1 ); // "woo:*" -> "woo:"
+		$prefix = substr( $granted, 0, -1 ); // strip trailing * to get the namespace prefix
 		return str_starts_with( $required, $prefix );
 	}
 }

@@ -13,7 +13,7 @@ final class ApiKeyFactoryTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		Monkey\setUp();
-		Functions\stubs( [ 'wp_salt' => static fn () => 'test-salt' ] );
+		Functions\stubs( array( 'wp_salt' => static fn () => 'test-salt' ) );
 	}
 
 	protected function tearDown(): void {

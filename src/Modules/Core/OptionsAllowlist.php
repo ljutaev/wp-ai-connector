@@ -12,7 +12,7 @@ namespace WPAIConnector\Modules\Core;
  */
 final class OptionsAllowlist {
 
-	private const SENSITIVE_PATTERNS = [
+	private const SENSITIVE_PATTERNS = array(
 		'_password',
 		'_secret',
 		'_token',
@@ -23,10 +23,10 @@ final class OptionsAllowlist {
 		'nonce_key',
 		'nonce_salt',
 		'secret_key',
-	];
+	);
 
 	/** @var array<int, string> */
-	private const DEFAULT_KEYS = [
+	private const DEFAULT_KEYS = array(
 		'blogname',
 		'blogdescription',
 		'blog_public',
@@ -71,13 +71,13 @@ final class OptionsAllowlist {
 		'template',
 		'stylesheet',
 		'active_plugins',
-	];
+	);
 
 	/** @return array<int, string> */
 	public function known(): array {
 		/** @var array<int, string> $filtered */
 		$filtered = apply_filters( 'wp_ai_connector_options_allowlist', self::DEFAULT_KEYS );
-		return array_values( array_filter( array_unique( $filtered ), [ $this, 'is_allowed' ] ) );
+		return array_values( array_filter( array_unique( $filtered ), array( $this, 'is_allowed' ) ) );
 	}
 
 	public function is_allowed( string $key ): bool {

@@ -27,15 +27,15 @@ final class SkillController extends AbstractController {
 		register_rest_route(
 			$this->namespace,
 			'/skill',
-			[
+			array(
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_item' ],
+				'callback'            => array( $this, 'get_item' ),
 				'permission_callback' => '__return_true',
-			]
+			)
 		);
 	}
 
-	public function get_item( WP_REST_Request $request ): WP_REST_Response {
+	public function get_item( mixed $request ): WP_REST_Response {
 		$manifest = $this->manifest_generator->generate( $this->modules );
 		$markdown = $this->skill_generator->generate( $manifest );
 

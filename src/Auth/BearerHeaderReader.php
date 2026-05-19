@@ -29,11 +29,15 @@ final class BearerHeaderReader {
 
 	private function raw_header_value(): ?string {
 		if ( ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
-			return (string) $_SERVER['HTTP_AUTHORIZATION'];
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- bearer token is validated downstream, not sanitized here.
+			$val = (string) $_SERVER['HTTP_AUTHORIZATION'];
+			return function_exists( 'wp_unslash' ) ? (string) wp_unslash( $val ) : stripslashes( $val );
 		}
 
 		if ( ! empty( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) ) {
-			return (string) $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- bearer token is validated downstream, not sanitized here.
+			$val = (string) $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+			return function_exists( 'wp_unslash' ) ? (string) wp_unslash( $val ) : stripslashes( $val );
 		}
 
 		if ( function_exists( 'getallheaders' ) ) {

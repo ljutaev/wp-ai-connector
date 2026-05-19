@@ -14,10 +14,12 @@ final class ManifestGeneratorTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		Monkey\setUp();
-		Functions\stubs( [
-			'home_url'     => static fn () => 'https://example.com',
-			'get_bloginfo' => static fn ( string $what ) => '7.0',
-		] );
+		Functions\stubs(
+			array(
+				'home_url'     => static fn () => 'https://example.com',
+				'get_bloginfo' => static fn () => '7.0',
+			)
+		);
 	}
 
 	protected function tearDown(): void {
@@ -26,7 +28,7 @@ final class ManifestGeneratorTest extends TestCase {
 	}
 
 	public function test_includes_plugin_info(): void {
-		$result = ( new ManifestGenerator() )->generate( [] );
+		$result = ( new ManifestGenerator() )->generate( array() );
 
 		self::assertSame( 'WP AI Connector', $result['plugin']['name'] );
 		self::assertSame( 'https://example.com', $result['plugin']['site_url'] );
@@ -34,19 +36,26 @@ final class ManifestGeneratorTest extends TestCase {
 	}
 
 	public function test_assembles_module_manifests(): void {
-		$module = new class extends AbstractModule {
-			public function name(): string    { return 'demo'; }
-			public function version(): string { return '0.1.0'; }
+		$module = new class() extends AbstractModule {
+			public function name(): string {
+				return 'demo'; }
+			public function version(): string {
+				return '0.1.0'; }
 			public function manifest(): array {
-				return [
+				return array(
 					'name'    => 'demo',
 					'version' => '0.1.0',
-					'routes'  => [ [ 'method' => 'GET', 'path' => '/demo' ] ],
-				];
+					'routes'  => array(
+						array(
+							'method' => 'GET',
+							'path'   => '/demo',
+						),
+					),
+				);
 			}
 		};
 
-		$result = ( new ManifestGenerator() )->generate( [ $module ] );
+		$result = ( new ManifestGenerator() )->generate( array( $module ) );
 
 		self::assertCount( 1, $result['modules'] );
 		self::assertSame( 'demo', $result['modules'][0]['name'] );

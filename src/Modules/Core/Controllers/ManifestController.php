@@ -28,15 +28,15 @@ final class ManifestController extends AbstractController {
 		register_rest_route(
 			$this->namespace,
 			'/manifest',
-			[
+			array(
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_item' ],
+				'callback'            => array( $this, 'get_item' ),
 				'permission_callback' => '__return_true',
-			]
+			)
 		);
 	}
 
-	public function get_item( WP_REST_Request $request ): WP_REST_Response {
+	public function get_item( mixed $request ): WP_REST_Response {
 		$cached = get_transient( self::CACHE_KEY );
 		if ( false !== $cached ) {
 			return new WP_REST_Response( $cached, 200 );

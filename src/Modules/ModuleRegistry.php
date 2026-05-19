@@ -15,7 +15,7 @@ final class ModuleRegistry {
 	 * @return array<int, ModuleInterface>
 	 */
 	public function load( array $candidates ): array {
-		$active = [];
+		$active = array();
 
 		foreach ( $candidates as $module ) {
 			if ( ! $this->all_conditionals_met( $module ) ) {

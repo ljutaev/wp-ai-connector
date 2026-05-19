@@ -9,7 +9,7 @@ abstract class AbstractModule implements ModuleInterface {
 
 	/** @return array<int, ConditionalInterface> */
 	public function conditionals(): array {
-		return [];
+		return array();
 	}
 
 	public function register( Container $container ): void {
@@ -18,15 +18,15 @@ abstract class AbstractModule implements ModuleInterface {
 
 	/** @return iterable<int, array{namespace: string, route: string, args: array<string, mixed>}> */
 	public function routes(): iterable {
-		return [];
+		return array();
 	}
 
 	/** @return array<string, mixed> */
 	public function manifest(): array {
-		return [
+		return array(
 			'name'    => $this->name(),
 			'version' => $this->version(),
-			'routes'  => [],
-		];
+			'routes'  => array(),
+		);
 	}
 }

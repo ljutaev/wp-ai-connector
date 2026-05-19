@@ -14,20 +14,20 @@ final class ManifestGenerator {
 	 * @return array<string, mixed>
 	 */
 	public function generate( array $modules ): array {
-		return [
-			'plugin'  => [
+		return array(
+			'plugin'  => array(
 				'name'        => 'WP AI Connector',
 				'version'     => self::PLUGIN_VERSION,
 				'site_url'    => function_exists( 'home_url' ) ? home_url() : '',
 				'wp_version'  => function_exists( 'get_bloginfo' ) ? get_bloginfo( 'version' ) : '',
 				'php_version' => PHP_VERSION,
-			],
+			),
 			'modules' => array_values(
 				array_map(
 					static fn ( ModuleInterface $m ): array => $m->manifest(),
 					$modules,
 				)
 			),
-		];
+		);
 	}
 }

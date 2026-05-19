@@ -14,7 +14,9 @@ use WP_REST_Response;
  */
 abstract class AbstractController extends WP_REST_Controller {
 
-	protected string $namespace = 'wp-ai-connector/v1';
+	/** @var string REST namespace for all plugin routes. */
+	// phpcs:ignore Squiz.Commenting.VariableComment.Missing -- @var above is the doc comment.
+	protected $namespace = 'wp-ai-connector/v1';
 
 	/**
 	 * @param array<string, mixed> $links Map of rel => href.

@@ -21,7 +21,7 @@ final class RestAuthBridge {
 	}
 
 	public function register(): void {
-		add_filter( 'rest_authentication_errors', [ $this, 'authenticate' ], 99 );
+		add_filter( 'rest_authentication_errors', array( $this, 'authenticate' ), 99 );
 	}
 
 	/**
@@ -45,7 +45,7 @@ final class RestAuthBridge {
 
 		wp_set_current_user( $key->user_id );
 
-		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['REMOTE_ADDR'] ) ) : '';
 		$this->repository->touch( $key->id, $ip );
 
 		return true;

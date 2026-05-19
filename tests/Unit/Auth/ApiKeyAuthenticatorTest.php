@@ -17,7 +17,7 @@ final class ApiKeyAuthenticatorTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		Monkey\setUp();
-		Functions\stubs( [ 'wp_salt' => static fn () => 'test-salt' ] );
+		Functions\stubs( array( 'wp_salt' => static fn () => 'test-salt' ) );
 	}
 
 	protected function tearDown(): void {
@@ -73,7 +73,7 @@ final class ApiKeyAuthenticatorTest extends TestCase {
 			label:         'test',
 			hash:          str_repeat( 'a', 64 ),
 			truncated_key: 'wpaic_live_abcd',
-			scopes:        [ '*' ],
+			scopes:        array( '*' ),
 			last_used_at:  null,
 			last_used_ip:  null,
 			created_at:    new DateTimeImmutable( '2026-01-01' ),
