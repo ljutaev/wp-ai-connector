@@ -25,6 +25,7 @@ final class ModuleRegistryTest extends TestCase {
 	public function test_module_register_is_called_for_active_modules_only(): void {
 		$registered = array();
 		$enabled    = new class( 'enabled', true, $registered ) extends AbstractModule {
+			/** @param array<int, string> $reg */
 			public function __construct( private string $n, private bool $on, public array &$reg ) {}
 			public function name(): string {
 				return $this->n; }

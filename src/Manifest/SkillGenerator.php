@@ -12,8 +12,8 @@ final class SkillGenerator {
 		$site_url = (string) ( $manifest['plugin']['site_url'] ?? '' );
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url -- wp_parse_url unavailable outside WP (unit tests).
 		$parsed = function_exists( 'wp_parse_url' ) ? wp_parse_url( $site_url, PHP_URL_HOST ) : parse_url( $site_url, PHP_URL_HOST );
-		$host     = is_string( $parsed ) ? $parsed : '';
-		$slug     = 'wp-ai-connector-' . str_replace( '.', '-', $host );
+		$host   = is_string( $parsed ) ? $parsed : '';
+		$slug   = 'wp-ai-connector-' . str_replace( '.', '-', $host );
 
 		$out  = "---\n";
 		$out .= "name: {$slug}\n";

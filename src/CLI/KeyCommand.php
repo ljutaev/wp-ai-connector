@@ -41,7 +41,7 @@ final class KeyCommand {
 	 */
 	public function create( array $args, array $assoc_args ): void {
 		$user_arg = $assoc_args['user'] ?? null;
-		$user = $user_arg ? get_user_by( is_numeric( $user_arg ) ? 'id' : 'login', $user_arg ) : wp_get_current_user();
+		$user     = $user_arg ? get_user_by( is_numeric( $user_arg ) ? 'id' : 'login', $user_arg ) : wp_get_current_user();
 
 		if ( false === $user || 0 === $user->ID ) {
 			WP_CLI::error( 'Could not resolve user.' );

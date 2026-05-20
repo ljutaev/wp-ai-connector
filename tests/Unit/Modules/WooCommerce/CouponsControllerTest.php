@@ -6,9 +6,9 @@ namespace WPAIConnector\Tests\Unit\Modules\WooCommerce;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
-use WPAIConnector\Modules\WooCommerce\Controllers\OrdersController;
+use WPAIConnector\Modules\WooCommerce\Controllers\CouponsController;
 
-final class OrdersControllerTest extends TestCase {
+final class CouponsControllerTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -23,7 +23,7 @@ final class OrdersControllerTest extends TestCase {
 	public function test_permissions_check_requires_manage_woocommerce(): void {
 		Functions\when( 'current_user_can' )->justReturn( false );
 
-		$result = ( new OrdersController() )->permissions_check(
+		$result = ( new CouponsController() )->permissions_check(
 			$this->createMock( \WP_REST_Request::class )
 		);
 
@@ -36,7 +36,7 @@ final class OrdersControllerTest extends TestCase {
 	public function test_permissions_check_returns_true_when_capable(): void {
 		Functions\when( 'current_user_can' )->justReturn( true );
 
-		$result = ( new OrdersController() )->permissions_check(
+		$result = ( new CouponsController() )->permissions_check(
 			$this->createMock( \WP_REST_Request::class )
 		);
 
@@ -45,10 +45,10 @@ final class OrdersControllerTest extends TestCase {
 
 	public function test_register_routes_calls_register_rest_route(): void {
 		Functions\expect( 'register_rest_route' )
-			->times( 3 )
+			->times( 2 )
 			->andReturn( true );
 
-		( new OrdersController() )->register_routes();
+		( new CouponsController() )->register_routes();
 
 		self::assertTrue( true ); // Brain Monkey validates call count in tearDown.
 	}

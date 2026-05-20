@@ -5,9 +5,16 @@ namespace WPAIConnector\Modules\WooCommerce\Controllers;
 
 use WP_REST_Response;
 use WP_REST_Server;
+use WPAIConnector\Modules\WooCommerce\WcDb;
 use WPAIConnector\REST\AbstractController;
 use WPAIConnector\REST\ErrorResponse;
 
+/**
+ * GET  /woocommerce/products                    — list (direct SQL, zero-hydration)
+ * GET  /woocommerce/products/{id}               — single + full details (direct SQL)
+ * POST /woocommerce/products/{id}               — update (WC functions for hook integrity)
+ * GET  /woocommerce/products/{id}/variations    — list variations (direct SQL)
+ */
 final class ProductsController extends AbstractController {
 
 	public function register_routes(): void {
@@ -20,27 +27,29 @@ final class ProductsController extends AbstractController {
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
 					'args'                => array(
-						'status'   => array(
+						'status'       => array(
 							'type'    => 'string',
 							'default' => 'publish',
 						),
-						'type'     => array( 'type' => 'string' ),
-						'category' => array( 'type' => 'string' ),
-						'sku'      => array( 'type' => 'string' ),
-						'featured' => array( 'type' => 'boolean' ),
-						'limit'    => array(
+						'sku'          => array( 'type' => 'string' ),
+						'stock_status' => array(
+							'type' => 'string',
+							'enum' => array( 'instock', 'outofstock', 'onbackorder' ),
+						),
+						'featured'     => array( 'type' => 'boolean' ),
+						'limit'        => array(
 							'type'    => 'integer',
 							'default' => 20,
 						),
-						'page'     => array(
+						'page'         => array(
 							'type'    => 'integer',
 							'default' => 1,
 						),
-						'orderby'  => array(
+						'orderby'      => array(
 							'type'    => 'string',
 							'default' => 'date',
 						),
-						'order'    => array(
+						'order'        => array(
 							'type'    => 'string',
 							'default' => 'DESC',
 							'enum'    => array( 'ASC', 'DESC' ),
@@ -70,15 +79,36 @@ final class ProductsController extends AbstractController {
 					'callback'            => array( $this, 'update_item' ),
 					'permission_callback' => array( $this, 'write_permissions_check' ),
 					'args'                => array(
-						'id'                 => array( 'type' => 'integer', 'required' => true ),
-						'name'               => array( 'type' => 'string' ),
-						'regular_price'      => array( 'type' => 'string' ),
-						'sale_price'         => array( 'type' => 'string' ),
-						'description'        => array( 'type' => 'string' ),
-						'short_description'  => array( 'type' => 'string' ),
-						'status'             => array( 'type' => 'string' ),
-						'stock_quantity'     => array( 'type' => 'integer' ),
-						'manage_stock'       => array( 'type' => 'boolean' ),
+						'id'                => array(
+							'type'     => 'integer',
+							'required' => true,
+						),
+						'name'              => array( 'type' => 'string' ),
+						'regular_price'     => array( 'type' => 'string' ),
+						'sale_price'        => array( 'type' => 'string' ),
+						'description'       => array( 'type' => 'string' ),
+						'short_description' => array( 'type' => 'string' ),
+						'status'            => array( 'type' => 'string' ),
+						'stock_quantity'    => array( 'type' => 'integer' ),
+						'manage_stock'      => array( 'type' => 'boolean' ),
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/woocommerce/products/(?P<id>\d+)/variations',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_variations' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => array(
+						'id' => array(
+							'type'     => 'integer',
+							'required' => true,
+						),
 					),
 				),
 			)
@@ -89,7 +119,6 @@ final class ProductsController extends AbstractController {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			return ErrorResponse::forbidden_capability( 'manage_woocommerce' );
 		}
-
 		return true;
 	}
 
@@ -97,82 +126,81 @@ final class ProductsController extends AbstractController {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			return ErrorResponse::forbidden_capability( 'manage_woocommerce' );
 		}
-
 		return true;
 	}
 
+	/** Direct SQL list — zero-hydration via wp_wc_product_meta_lookup. */
 	public function get_items( mixed $request ): WP_REST_Response {
-		$args = array(
-			'status'  => sanitize_key( (string) $request->get_param( 'status' ) ),
-			'limit'   => min( (int) $request->get_param( 'limit' ), 100 ),
-			'page'    => (int) $request->get_param( 'page' ),
-			'orderby' => sanitize_key( (string) $request->get_param( 'orderby' ) ),
-			'order'   => strtoupper( sanitize_key( (string) $request->get_param( 'order' ) ) ),
+		$status       = sanitize_key( (string) $request->get_param( 'status' ) );
+		$limit        = min( (int) $request->get_param( 'limit' ), 100 );
+		$page         = max( 1, (int) $request->get_param( 'page' ) );
+		$orderby      = sanitize_key( (string) $request->get_param( 'orderby' ) );
+		$order        = sanitize_key( (string) $request->get_param( 'order' ) );
+		$sku          = $request->get_param( 'sku' );
+		$stock_status = $request->get_param( 'stock_status' );
+		$featured     = $request->get_param( 'featured' );
+
+		$rows  = WcDb::get_products_list(
+			$status,
+			null,
+			null !== $sku ? sanitize_text_field( (string) $sku ) : null,
+			null !== $featured ? (bool) $featured : null,
+			null !== $stock_status ? sanitize_key( (string) $stock_status ) : null,
+			$limit,
+			$page,
+			$orderby,
+			$order
 		);
-
-		$type = $request->get_param( 'type' );
-		if ( null !== $type ) {
-			$args['type'] = sanitize_key( (string) $type );
-		}
-
-		$category = $request->get_param( 'category' );
-		if ( null !== $category ) {
-			$args['category'] = array( sanitize_key( (string) $category ) );
-		}
-
-		$sku = $request->get_param( 'sku' );
-		if ( null !== $sku ) {
-			$args['sku'] = sanitize_text_field( (string) $sku );
-		}
-
-		$featured = $request->get_param( 'featured' );
-		if ( null !== $featured ) {
-			$args['featured'] = (bool) $featured;
-		}
-
-		$products = wc_get_products( $args );
-		$items    = array();
-
-		foreach ( $products as $product ) {
-			if ( ! $product instanceof \WC_Product ) {
-				continue;
-			}
-			$items[] = $this->prepare_product( $product );
-		}
+		$items = array_map( array( $this, 'format_product_row' ), $rows );
 
 		return new WP_REST_Response( $items, 200 );
 	}
 
+	/** Direct SQL single product — full detail including dimensions and prices. */
 	public function get_item( mixed $request ): WP_REST_Response|\WP_Error {
-		$product = wc_get_product( (int) $request->get_param( 'id' ) );
+		$id  = (int) $request->get_param( 'id' );
+		$row = WcDb::get_product( $id );
 
-		if ( false === $product || ! $product instanceof \WC_Product ) {
+		if ( null === $row ) {
 			return ErrorResponse::not_found( 'Product not found.' );
 		}
 
-		$data = $this->prepare_product( $product );
-
-		// Add full description and stock details in single view.
-		$data['description']       = $product->get_description();
-		$data['short_description'] = $product->get_short_description();
-		$data['stock_quantity']    = $product->get_stock_quantity();
-		$data['manage_stock']      = $product->managing_stock();
-		$data['backorders']        = $product->get_backorders();
-		$data['weight']            = $product->get_weight();
-		$data['dimensions']        = array(
-			'length' => $product->get_length(),
-			'width'  => $product->get_width(),
-			'height' => $product->get_height(),
+		$data = array(
+			'id'                => (int) $row['id'],
+			'name'              => (string) ( $row['name'] ?? '' ),
+			'slug'              => (string) ( $row['slug'] ?? '' ),
+			'status'            => (string) ( $row['status'] ?? '' ),
+			'sku'               => (string) ( $row['sku'] ?? '' ),
+			'price'             => (string) ( $row['price'] ?? '0' ),
+			'max_price'         => (string) ( $row['max_price'] ?? '0' ),
+			'regular_price'     => (string) ( $row['regular_price'] ?? '' ),
+			'sale_price'        => (string) ( $row['sale_price'] ?? '' ),
+			'stock_status'      => (string) ( $row['stock_status'] ?? 'instock' ),
+			'stock_quantity'    => null !== $row['stock_quantity'] ? (int) $row['stock_quantity'] : null,
+			'virtual'           => (bool) $row['virtual'],
+			'downloadable'      => (bool) $row['downloadable'],
+			'average_rating'    => (string) ( $row['average_rating'] ?? '0.00' ),
+			'rating_count'      => (int) ( $row['rating_count'] ?? 0 ),
+			'total_sales'       => (int) ( $row['total_sales'] ?? 0 ),
+			'description'       => (string) ( $row['description'] ?? '' ),
+			'short_description' => (string) ( $row['short_description'] ?? '' ),
+			'date_created'      => (string) ( $row['date_created'] ?? '' ),
+			'date_modified'     => (string) ( $row['date_modified'] ?? '' ),
+			'dimensions'        => array(
+				'weight' => (string) ( $row['weight'] ?? '' ),
+				'length' => (string) ( $row['length'] ?? '' ),
+				'width'  => (string) ( $row['width'] ?? '' ),
+				'height' => (string) ( $row['height'] ?? '' ),
+			),
+			'_links'            => array(
+				'self' => rest_url( "{$this->namespace}/woocommerce/products/{$id}" ),
+			),
 		);
 
-		$response = new WP_REST_Response( $data, 200 );
-
-		return $this->enrich_links(
-			$response,
-			array( 'self' => rest_url( "{$this->namespace}/woocommerce/products/{$product->get_id()}" ) )
-		);
+		return new WP_REST_Response( $data, 200 );
 	}
 
+	/** Update product via WC functions — preserves hooks, stock recalc, cache. */
 	public function update_item( mixed $request ): WP_REST_Response|\WP_Error {
 		$product = wc_get_product( (int) $request->get_param( 'id' ) );
 
@@ -225,27 +253,30 @@ final class ProductsController extends AbstractController {
 		return $this->get_item( $request );
 	}
 
-	/** @return array<string, mixed> */
-	private function prepare_product( \WC_Product $product ): array {
+	/** Direct SQL variations list with attributes. */
+	public function get_variations( mixed $request ): WP_REST_Response|\WP_Error {
+		$id   = (int) $request->get_param( 'id' );
+		$rows = WcDb::get_product_variations( $id );
+
+		return new WP_REST_Response( $rows, 200 );
+	}
+
+	/** @param array<string, mixed> $row */
+	private function format_product_row( array $row ): array {
 		return array(
-			'id'            => $product->get_id(),
-			'name'          => $product->get_name(),
-			'slug'          => $product->get_slug(),
-			'type'          => $product->get_type(),
-			'status'        => $product->get_status(),
-			'sku'           => $product->get_sku(),
-			'price'         => $product->get_price(),
-			'regular_price' => $product->get_regular_price(),
-			'sale_price'    => $product->get_sale_price(),
-			'on_sale'       => $product->is_on_sale(),
-			'stock_status'  => $product->get_stock_status(),
-			'total_sales'   => $product->get_total_sales(),
-			'categories'    => array_map(
-				static fn ( $term ) => array( 'id' => $term->term_id, 'name' => $term->name, 'slug' => $term->slug ),
-				get_the_terms( $product->get_id(), 'product_cat' ) ?: array()
-			),
-			'_links'        => array(
-				'self' => rest_url( "{$this->namespace}/woocommerce/products/{$product->get_id()}" ),
+			'id'           => (int) $row['id'],
+			'name'         => (string) ( $row['name'] ?? '' ),
+			'slug'         => (string) ( $row['slug'] ?? '' ),
+			'status'       => (string) ( $row['status'] ?? '' ),
+			'sku'          => (string) ( $row['sku'] ?? '' ),
+			'price'        => (string) ( $row['price'] ?? '0' ),
+			'max_price'    => (string) ( $row['max_price'] ?? '0' ),
+			'stock_status' => (string) ( $row['stock_status'] ?? 'instock' ),
+			'virtual'      => (bool) $row['virtual'],
+			'downloadable' => (bool) $row['downloadable'],
+			'date_created' => (string) ( $row['date_created'] ?? '' ),
+			'_links'       => array(
+				'self' => rest_url( "{$this->namespace}/woocommerce/products/{$row['id']}" ),
 			),
 		);
 	}

@@ -45,7 +45,7 @@ final class ProductsControllerTest extends TestCase {
 
 	public function test_register_routes_calls_register_rest_route(): void {
 		Functions\expect( 'register_rest_route' )
-			->times( 2 )
+			->times( 3 )
 			->andReturn( true );
 
 		( new ProductsController() )->register_routes();
