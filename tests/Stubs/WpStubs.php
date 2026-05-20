@@ -31,7 +31,10 @@ if ( ! class_exists( 'WP_REST_Response' ) ) {
 		/** @var array<string, string> */
 		private array $headers = array();
 
-		/** @var array<string, array<int, array<string, string>>> */
+		/**
+		 * @var array<string, array<int, array<string, string>>>
+		 * @phpstan-ignore property.onlyWritten
+		 */
 		private array $links = array();
 
 		/** @param mixed $data */
@@ -94,6 +97,11 @@ if ( ! class_exists( 'WP_Error' ) ) {
 		public function get_error_data() {
 			return $this->data;
 		}
+
+		/** @param mixed $data */
+		public function add_data( $data, string $code = '' ): void {
+			$this->data = $data;
+		}
 	}
 }
 
@@ -117,6 +125,14 @@ if ( ! class_exists( 'WP_REST_Request' ) ) {
 			foreach ( $params as $key => $value ) {
 				$this->params[ $key ] = $value;
 			}
+		}
+
+		public function get_method(): string {
+			return 'GET';
+		}
+
+		public function get_route(): string {
+			return '';
 		}
 	}
 }
@@ -206,7 +222,9 @@ if ( ! class_exists( 'WP_Query' ) ) {
 		public int $max_num_pages = 1;
 
 		/** @param array<string, mixed> $args */
-		public function __construct( array $args = array() ) {}
+		public function __construct( array $args = array() ) {
+			unset( $args ); // stub: no-op constructor.
+		}
 	}
 }
 
@@ -274,5 +292,45 @@ if ( ! class_exists( 'WC_Product' ) ) {
 		public function set_stock_quantity( int $qty ): void {}
 		public function set_manage_stock( bool $manage ): void {}
 		public function save(): int { return 0; }
+	}
+}
+
+if ( ! class_exists( 'WC_Coupon' ) ) {
+	class WC_Coupon {
+		/** @var int */
+		private int $id = 0;
+
+		/** @var string */
+		private string $code = '';
+
+		/** @param int|string $code_or_id */
+		public function __construct( $code_or_id = '' ) {
+			if ( is_int( $code_or_id ) ) {
+				$this->id = $code_or_id;
+			}
+		}
+
+		public function get_id(): int { return $this->id; }
+		public function get_code(): string { return $this->code; }
+		public function get_discount_type(): string { return 'fixed_cart'; }
+		public function get_amount(): string { return '0.00'; }
+		public function get_usage_count(): int { return 0; }
+		public function get_usage_limit(): int { return 0; }
+		public function get_individual_use(): bool { return false; }
+		public function get_free_shipping(): bool { return false; }
+		public function get_minimum_amount(): string { return ''; }
+		public function get_maximum_amount(): string { return ''; }
+		public function set_code( string $code ): void { $this->code = $code; }
+		public function set_discount_type( string $type ): void {}
+		public function set_amount( string $amount ): void {}
+		public function set_description( string $desc ): void {}
+		/** @param mixed $date */
+		public function set_date_expires( $date ): void {}
+		public function set_usage_limit( int $limit ): void {}
+		public function set_individual_use( bool $use ): void {}
+		public function set_free_shipping( bool $free ): void {}
+		public function set_minimum_amount( string $amount ): void {}
+		public function set_maximum_amount( string $amount ): void {}
+		public function save(): int { return $this->id; }
 	}
 }
