@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace WPAIConnector\Tests\Unit\Modules\Core;
+namespace WPAIConnector\Tests\Unit\Modules\Yoast;
 
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
-use WPAIConnector\Modules\Core\Controllers\MenusController;
+use WPAIConnector\Modules\Yoast\Controllers\SeoController;
 
-final class MenusControllerTest extends TestCase {
+final class SeoControllerTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -20,24 +20,23 @@ final class MenusControllerTest extends TestCase {
 		parent::tearDown();
 	}
 
-	public function test_permissions_check_requires_manage_options(): void {
+	public function test_permissions_check_requires_edit_posts(): void {
 		Functions\when( 'current_user_can' )->justReturn( false );
 
-		$controller = new MenusController();
-		$request    = $this->createMock( \WP_REST_Request::class );
-
-		$result = $controller->permissions_check( $request );
+		$result = ( new SeoController() )->permissions_check(
+			$this->createMock( \WP_REST_Request::class )
+		);
 
 		self::assertInstanceOf( \WP_Error::class, $result );
 		$data = $result->get_error_data();
 		self::assertIsArray( $data );
-		self::assertSame( 'manage_options', $data['capability'] );
+		self::assertSame( 'edit_posts', $data['capability'] );
 	}
 
 	public function test_permissions_check_returns_true_when_capable(): void {
 		Functions\when( 'current_user_can' )->justReturn( true );
 
-		$result = ( new MenusController() )->permissions_check(
+		$result = ( new SeoController() )->permissions_check(
 			$this->createMock( \WP_REST_Request::class )
 		);
 
@@ -49,7 +48,7 @@ final class MenusControllerTest extends TestCase {
 			->times( 3 )
 			->andReturn( true );
 
-		( new MenusController() )->register_routes();
+		( new SeoController() )->register_routes();
 
 		self::assertTrue( true ); // Brain Monkey validates call count in tearDown.
 	}

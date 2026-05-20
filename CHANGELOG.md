@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-05-20
+
+### Added
+
+- `MediaController` v2 — `POST /media/{id}` (update alt/caption/title), `DELETE /media/{id}` (trash or permanent), `POST /media/upload` (multipart); list returns `width`, `height`, `thumbnail`; detail returns all registered `sizes` with dimensions
+- `MenusController` v2 — `GET /menu-locations` (theme locations with assigned menu); list includes `locations[]`; single menu returns nested item tree with resolved URLs, `type`, `target`, `classes`
+- `YoastSeoModule` — conditional module (activates when Yoast SEO active)
+  - `GET /yoast/posts/{id}` — reads `wp_yoast_indexable` (Yoast 14+), falls back to `_yoast_wpseo_*` postmeta
+  - `POST /yoast/posts/{id}` — update `seo_title`, `meta_description`, `focus_keyphrase`, `canonical`, `noindex`, `og_*`, `twitter_*`
+  - `GET /yoast/terms/{id}` — SEO data for taxonomy terms
+  - `GET /yoast/settings` — company/person entity, social profiles, separator
+
 ## [0.3.0] - 2026-05-19
 
 ### Added

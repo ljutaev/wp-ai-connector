@@ -152,6 +152,7 @@ if ( ! class_exists( 'WP_Post' ) ) {
 		public int $ID                = 0;
 		public string $post_title     = '';
 		public string $post_content   = '';
+		public string $post_excerpt   = '';
 		public string $post_status    = 'publish';
 		public string $post_type      = 'post';
 		public string $post_date      = '';
@@ -159,6 +160,9 @@ if ( ! class_exists( 'WP_Post' ) ) {
 		public string $guid           = '';
 		public string $post_mime_type = '';
 		public int $menu_order        = 0;
+		public int $post_parent       = 0;
+		public string $post_name      = '';
+		public string $post_modified  = '';
 	}
 }
 

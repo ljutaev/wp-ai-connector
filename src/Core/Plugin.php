@@ -21,6 +21,7 @@ use WPAIConnector\Modules\Core\CoreModule;
 use WPAIConnector\Modules\ModuleInterface;
 use WPAIConnector\Modules\ModuleRegistry;
 use WPAIConnector\Modules\WooCommerce\WooCommerceModule;
+use WPAIConnector\Modules\Yoast\YoastModule;
 
 final class Plugin {
 
@@ -62,6 +63,7 @@ final class Plugin {
 		$defaults = array(
 			new CoreModule(),
 			new WooCommerceModule(),
+			new YoastModule(),
 		);
 
 		/** @var array<int, ModuleInterface> $candidates */
