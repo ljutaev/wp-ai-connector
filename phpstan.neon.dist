@@ -12,9 +12,10 @@ parameters:
   reportUnmatchedIgnoredErrors: true
   checkMissingIterableValueType: true
   excludePaths:
-    # WooCommerce classes (WC_Order, WC_Product, wc_get_orders, etc.) are only available
-    # when WooCommerce is active. PHPStan runs without WC installed.
+    # WooCommerce classes are only available when WooCommerce is active.
     - src/Modules/WooCommerce
+    # Yoast SEO classes (WPSEO_Options, YoastSEO, etc.) are only available when plugin is active.
+    - src/Modules/Yoast
 
   ignoreErrors:
     # WP_CLI is loaded conditionally; unavailable to PHPStan analysis.
