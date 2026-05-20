@@ -77,9 +77,9 @@ final class QueryController extends AbstractController {
 	}
 
 	public function execute( mixed $request ): WP_REST_Response|\WP_Error {
-		$sql         = trim( (string) $request->get_param( 'sql' ) );
-		$limit       = min( (int) $request->get_param( 'limit' ), self::MAX_LIMIT );
-		$limit       = max( 1, $limit );
+		$sql   = trim( (string) $request->get_param( 'sql' ) );
+		$limit = min( (int) $request->get_param( 'limit' ), self::MAX_LIMIT );
+		$limit = max( 1, $limit );
 
 		if ( ! self::is_safe( $sql ) ) {
 			return ErrorResponse::make(
