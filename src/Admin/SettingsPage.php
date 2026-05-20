@@ -276,7 +276,7 @@ final class SettingsPage {
 			wp_die( esc_html__( 'Access denied.', 'wp-ai-connector' ) );
 		}
 
-		$key_id = (int) wp_unslash( $_POST['key_id'] ?? 0 );
+		$key_id = isset( $_POST['key_id'] ) ? (int) sanitize_text_field( wp_unslash( (string) $_POST['key_id'] ) ) : 0;
 		check_admin_referer( 'wpaic_revoke_key_' . $key_id );
 
 		if ( $key_id > 0 ) {

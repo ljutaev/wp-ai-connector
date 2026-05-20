@@ -74,7 +74,7 @@ final class AuditLogger {
 	public function purge( int $days = 30 ): int {
 		global $wpdb;
 
-		$table  = $wpdb->prefix . self::TABLE_SUFFIX;
+		$table     = $wpdb->prefix . self::TABLE_SUFFIX;
 		$timestamp = strtotime( "-{$days} days" );
 		$cutoff    = gmdate( 'Y-m-d H:i:s', is_int( $timestamp ) ? $timestamp : 0 );
 
