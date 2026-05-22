@@ -45,7 +45,7 @@ final class SeoControllerTest extends TestCase {
 
 	public function test_register_routes_calls_register_rest_route(): void {
 		Functions\expect( 'register_rest_route' )
-			->times( 3 )
+			->times( 9 )
 			->andReturn( true );
 
 		( new SeoController() )->register_routes();

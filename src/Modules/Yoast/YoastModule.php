@@ -15,7 +15,7 @@ final class YoastModule extends AbstractModule {
 	}
 
 	public function version(): string {
-		return '0.1.0';
+		return '0.2.0';
 	}
 
 	/** @return array<int, \WPAIConnector\Modules\ConditionalInterface> */
@@ -49,18 +49,20 @@ final class YoastModule extends AbstractModule {
 				'version' => $version,
 			),
 			'routes'      => array(
+
+				// ── Per-post SEO ─────────────────────────────────────────────
 				array(
 					'method'      => 'GET',
 					'path'        => '/yoast/posts/{id}',
 					'scope'       => 'yoast:read',
-					'description' => 'Get SEO metadata for a post. Reads from wp_yoast_indexable (Yoast 14+) with postmeta fallback.',
-					'ai_hint'     => 'Returns seo_title, meta_description, focus_keyphrase, canonical, noindex/nofollow, og_* and twitter_* fields. source=indexable means fresh data; source=postmeta means indexable table missing.',
+					'description' => 'Full SEO data for a post — reads wp_yoast_indexable (40+ fields) with postmeta fallback.',
+					'ai_hint'     => 'Returns seo_title, meta_description, focus_keyphrase, canonical, breadcrumb_title, all robots flags, OG/Twitter fields, schema_page_type, schema_article_type, is_cornerstone, seo_score, readability_score, estimated_reading_time, link_count, incoming_link_count, primary_terms. source=indexable when fresh; source=postmeta when indexable table missing.',
 				),
 				array(
 					'method'      => 'POST',
 					'path'        => '/yoast/posts/{id}',
 					'scope'       => 'yoast:write',
-					'description' => 'Update Yoast SEO fields for a post.',
+					'description' => 'Update Yoast SEO fields. Writes to _yoast_wpseo_* postmeta and fires wpseo_save_indexable hook.',
 					'parameters'  => array(
 						array(
 							'name' => 'seo_title',
@@ -83,35 +85,130 @@ final class YoastModule extends AbstractModule {
 							'type' => 'string',
 						),
 						array(
+							'name' => 'is_cornerstone',
+							'in'   => 'body',
+							'type' => 'boolean',
+						),
+						array(
 							'name' => 'noindex',
 							'in'   => 'body',
 							'type' => 'boolean',
 						),
 						array(
-							'name' => 'og_title',
+							'name' => 'nofollow',
+							'in'   => 'body',
+							'type' => 'boolean',
+						),
+						array(
+							'name' => 'noarchive',
+							'in'   => 'body',
+							'type' => 'boolean',
+						),
+						array(
+							'name' => 'schema_page_type',
 							'in'   => 'body',
 							'type' => 'string',
 						),
 						array(
-							'name' => 'og_description',
+							'name' => 'schema_article_type',
 							'in'   => 'body',
 							'type' => 'string',
 						),
 					),
-					'ai_hint'     => 'To hide a post from search engines: POST noindex=true. To set a custom title without %%sep%% template: set seo_title to a plain string.',
+					'ai_hint'     => 'To hide a post from search engines: POST noindex=true. To mark high-value content: POST is_cornerstone=true. Yoast templates like %%title%% %%sep%% %%sitename%% are supported in seo_title.',
 				),
+				array(
+					'method'      => 'GET',
+					'path'        => '/yoast/posts/{id}/internal-links',
+					'scope'       => 'yoast:read',
+					'description' => 'Outgoing and incoming internal links for a post (from wp_yoast_seo_links graph).',
+					'ai_hint'     => 'Returns { outgoing: [...], incoming: [...] }. Each link has url, type, source/target title and permalink.',
+				),
+
+				// ── Per-term SEO ─────────────────────────────────────────────
 				array(
 					'method'      => 'GET',
 					'path'        => '/yoast/terms/{id}',
 					'scope'       => 'yoast:read',
-					'description' => 'Get SEO metadata for a taxonomy term (category, tag, custom taxonomy).',
-					'ai_hint'     => 'Uses wpseo_taxonomy_meta option if indexable table unavailable.',
+					'description' => 'SEO data for a taxonomy term (category, tag, custom taxonomy).',
 				),
+
+				// ── Site-wide ────────────────────────────────────────────────
 				array(
 					'method'      => 'GET',
 					'path'        => '/yoast/settings',
 					'scope'       => 'yoast:read',
-					'description' => 'Site-wide Yoast SEO configuration: company/person entity, social profiles, separator.',
+					'description' => 'Site-wide Yoast settings: company/person entity, social profiles, separator, breadcrumbs config.',
+				),
+				array(
+					'method'      => 'GET',
+					'path'        => '/yoast/search-appearance',
+					'scope'       => 'yoast:read',
+					'description' => 'Title templates, meta description templates, and noindex defaults per post type and taxonomy.',
+					'ai_hint'     => 'Returns templates with %%title%% / %%sitename%% placeholders. post_types and taxonomies maps each show_in_search flag.',
+				),
+
+				// ── Audit / health ───────────────────────────────────────────
+				array(
+					'method'      => 'GET',
+					'path'        => '/yoast/health',
+					'scope'       => 'yoast:read',
+					'description' => 'Site-wide SEO health summary: total indexables, cornerstone count, missing focus keyphrase, average scores.',
+				),
+				array(
+					'method'      => 'GET',
+					'path'        => '/yoast/cornerstone',
+					'scope'       => 'yoast:read',
+					'description' => 'Cornerstone content list — high-value posts ordered by incoming link count.',
+					'parameters'  => array(
+						array(
+							'name'    => 'limit',
+							'in'      => 'query',
+							'type'    => 'integer',
+							'default' => 20,
+						),
+						array(
+							'name'    => 'page',
+							'in'      => 'query',
+							'type'    => 'integer',
+							'default' => 1,
+						),
+					),
+				),
+				array(
+					'method'      => 'GET',
+					'path'        => '/yoast/needs-improvement',
+					'scope'       => 'yoast:read',
+					'description' => 'Published posts with SEO or readability score below threshold (default 40). Ranked worst first.',
+					'parameters'  => array(
+						array(
+							'name'    => 'threshold',
+							'in'      => 'query',
+							'type'    => 'integer',
+							'default' => 40,
+						),
+						array(
+							'name'    => 'limit',
+							'in'      => 'query',
+							'type'    => 'integer',
+							'default' => 20,
+						),
+					),
+					'ai_hint'     => 'Use this to find posts that need rewriting/optimization. Yoast scores are 0–100.',
+				),
+				array(
+					'method'      => 'GET',
+					'path'        => '/yoast/orphaned',
+					'scope'       => 'yoast:read',
+					'description' => 'Posts with zero incoming internal links — candidates for new internal links from related content.',
+					'parameters'  => array(
+						array(
+							'name'    => 'limit',
+							'in'      => 'query',
+							'type'    => 'integer',
+							'default' => 20,
+						),
+					),
 				),
 			),
 		);
