@@ -71,12 +71,14 @@ Claude now knows your site's exact capabilities — without paying the per-turn 
 
 ## Modules
 
-| Module | Status | What it exposes |
-|---|---|---|
-| Core | Designing | Posts, pages, users, options, SQL SELECT, manifest, skill |
-| WooCommerce | Planned | Orders, products, customers, coupons |
-| Yoast SEO | Planned | Per-post SEO meta, sitemap status, redirects |
-| Advanced Custom Fields | Planned | Field groups, post meta read/write |
+| Module | Status | Routes | What it exposes |
+|---|---|---|---|
+| Core | Alpha | ~35 | Posts, users, terms, comments, media (upload/delete/sizes), menus (locations + tree), options, query (SQL SELECT), plugins, themes, transients, cron |
+| WooCommerce | Alpha | 18 | Orders (HPOS + legacy auto-detect), products with variations, customers, coupons, sales/top-products reports |
+| Yoast SEO | Alpha | 9 | Full `wp_yoast_indexable` (40+ fields), internal link graph, cornerstone, needs-improvement, orphaned, search appearance, site health |
+| Advanced Custom Fields | Planned | — | Field groups, post meta read/write |
+
+**Reads** go through zero-hydration direct `$wpdb` queries on plugin analytics tables (sub-50ms). **Writes** route through host-plugin functions (`wc_create_order`, `WC_Coupon::save`, `update_post_meta` + Yoast `wpseo_save_indexable`) to preserve hooks, cache invalidation, and email triggers.
 
 Want a module for the plugin you depend on? Open a feature request or send a PR — see [CONTRIBUTING.md](CONTRIBUTING.md#adding-a-module).
 
