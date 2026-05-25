@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-05-25
+
+### Added — Yoast SEO module v2
+
+- `YoastDb` shared helper — direct `$wpdb` access to all four Yoast tables (`wp_yoast_indexable`, `wp_yoast_seo_links`, `wp_yoast_primary_term`, `wp_yoast_indexable_hierarchy`)
+- `GET /yoast/posts/{id}` — expanded from ~12 to 40+ fields: schema_page_type, schema_article_type, is_cornerstone, estimated_reading_time, advanced robots (noarchive/noimageindex/nosnippet), inclusive_language_score, breadcrumb_title, link_count, incoming_link_count, primary_terms, post_status, is_public, is_protected
+- `POST /yoast/posts/{id}` — write cornerstone toggle, schema types, advanced robots flags (packed into `_yoast_wpseo_meta-robots-adv` comma list as Yoast expects)
+- `GET /yoast/posts/{id}/internal-links` — outgoing + incoming internal links from `wp_yoast_seo_links` graph, joined with indexable for source/target titles and permalinks
+- `GET /yoast/health` — site-wide SEO health summary: total indexables, cornerstone count, missing focus keyphrase/title/description counts, avg SEO and readability scores
+- `GET /yoast/cornerstone` — high-value posts ordered by incoming link count
+- `GET /yoast/needs-improvement` — published posts with SEO or readability below configurable threshold (default 40)
+- `GET /yoast/orphaned` — posts with zero incoming internal links (linking candidates)
+- `GET /yoast/search-appearance` — title templates and noindex defaults for home/author/archive/search/404 plus every public post_type and taxonomy
+- `GET /yoast/settings` — extended with breadcrumbs config, LinkedIn/Instagram/YouTube/Pinterest URLs, RSS footer, sitemap enable flag
+- YoastSeoModule version bumped to `0.2.0`
+
 ## [0.4.0] - 2026-05-20
 
 ### Added
