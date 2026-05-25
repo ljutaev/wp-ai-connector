@@ -15,7 +15,7 @@
 
 ---
 
-> **Status:** Pre-alpha. Scaffold only — no implementation yet.
+> **Status:** Alpha (`v0.5.0`). ~62 REST routes across Core, WooCommerce, and Yoast SEO modules. API surface may still change before `1.0.0`.
 
 ## Why
 
